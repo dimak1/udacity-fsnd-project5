@@ -4,22 +4,42 @@
 <head>
     <meta charset="utf-8">
     <title>Local Map</title>
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css" media="screen" title="no title">
 </head>
 
 <body>
-    <h3>My Google Maps Location</h3>
-    <div id="map"></div>
+    <div class="container-fluid">
+        <h3>My Google Maps Location</h3>
+        <div class="row">
+            <div class="col col-md-2">
+                <div class="dropdown" id="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Select Location
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <button class="dropdown-item" type="button" value="toronto">Toronto</button>
+                        <button class="dropdown-item" type="button" value="new york">New York</button>
+                        <button class="dropdown-item" type="button" value="miami">Miami</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-md-10">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap">
-    </script>
-    <script type="text/javascript" src="js/app.js">
-    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
+    <script type="text/javascript" src="js/app.js"></script>
 </body>
 
 </html>
