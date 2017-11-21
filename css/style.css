@@ -1,4 +1,9 @@
 #map {
-    height: 400px;
+    height: 500px;
     width: 100%;
+    border: 1px solid black;
+}
+
+.attractions-list li {
+    /*list-style: none;*/
 }
