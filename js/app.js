@@ -1,18 +1,26 @@
 var city = "";
 var attractions = [];
+var infoWindow;
+
+$(function() {
+    $('[data-toggle="tooltip"]').tooltip()
+})
 
 // KNOCKOUT APP
-function CityAttraction(marker, rating) {
+function CityAttraction(marker, rating, address, icon) {
     // var self = this;
     this.name = marker.getTitle();
     // self.location = marker.getPosition();
     this.marker = marker;
     this.rating = rating;
+    this.address = address;
+    this.icon = icon;
 }
 
 var ViewModel = {
     currentCity: ko.observable(),
-    cityAttractions: ko.observableArray([])
+    cityAttractions: ko.observableArray([]),
+    cityList: ["Torotno", "New York", "Miami"]
 };
 
 ko.applyBindings(ViewModel)
@@ -21,6 +29,8 @@ ko.applyBindings(ViewModel)
 var map;
 
 function initMap() {
+
+    infoWindow = new google.maps.InfoWindow();
 
     var toronto = {
         "lat": 43.653226,
@@ -59,13 +69,16 @@ function createMarker(place) {
         map: map
     });
 
-    ViewModel.cityAttractions.push(new CityAttraction(marker, place.rating));
+    var cityAttration = new CityAttraction(marker,
+        place.rating, place.formatted_address, place.icon);
+
+    ViewModel.cityAttractions.push(cityAttration);
 }
 
-$('.dropdown-item').click(function() {
-    city = $(this).attr("value");
-    ViewModel.currentCity(city);
+function selectCity(city) {
 
+    $('.collapse').collapse("hide");
+    ViewModel.currentCity(city);
     var request = {
         query: city + "+point+of+interest",
         language: "en"
@@ -73,9 +86,13 @@ $('.dropdown-item').click(function() {
 
     service = new google.maps.places.PlacesService(map);
     service.textSearch(request, callback);
-})
+}
 
 function showAttractionDetails() {
+
+    $('.collapse').collapse("hide");
+
+    infoWindow.close();
     var self = this.marker;
     // var location = this.location;
     self.setAnimation(google.maps.Animation.BOUNCE);
@@ -83,4 +100,7 @@ function showAttractionDetails() {
         self.setAnimation(null);
     }).bind(self), 1400);
     map.panTo(self.getPosition());
+
+    infoWindow.setContent(self.getTitle() + "<br/>" + this.address);
+    infoWindow.open(map, self);
 }

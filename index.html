@@ -11,43 +11,36 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">My Google Maps Location</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Select City
-        </a>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button class="dropdown-item" type="button" value="Toronto">Toronto</button>
-                        <button class="dropdown-item" type="button" value="New+York">New York</button>
-                        <button class="dropdown-item" type="button" value="Miami">Miami</button>
-                    </div>
-                </li>
-                <span class="navbar-text">
-                    Current City: <span id="current-city" data-bind="text: currentCity"></span>
-                </span>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </div>
+        <a class="navbar-brand" href="#">Attractions Finder</a>
+        <span class="navbar-text">
+            Current City: <span id="current-city" class="text-primary" data-bind="text: currentCity"></span>
+        </span>
+        <span><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#cities" aria-controls="attractions" aria-expanded="false" aria-label="Toggle navigation">
+            Select City
+        </button>
+        <button class="navbar-toggler text-success" type="button" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false"
+            aria-label="Toggle navigation" data-bind="enable: cityAttractions().length>0">
+            View Attractions
+        </button></span>
     </nav>
+    <div class="collapse mt-2" id="attractions">
+        <div class="my-2 px-4">
+            <input class="form-control" type="search" placeholder="Search Attractions" aria-label="Search">
+        </div>
+        <ul class="attraction-list" data-bind="foreach: cityAttractions">
+            <li class="py-1">
+                <img data-bind="attr: {src: icon}" alt="" />
+                <a href="#" data-bind="text: name, click: showAttractionDetails"></a>
+                <span data-bind="text: rating" class="text-muted"></span>
+            </li>
+        </ul>
+    </div>
+    <div class="collapse city-list text-center" id="cities" data-bind="foreach: cityList">
+        <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)"></button>
+    </div>
     <div class="container-fluid pt-2">
         <div class="row">
-            <div class="col col-md-3">
-                <ul class="list-group" data-bind="foreach: cityAttractions">
-                    <li class="list-group-item small">
-                        <a href="#" data-bind="text: name, click: showAttractionDetails"></a> <span data-bind="text: rating" class="text-muted"></span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col col-md-9">
+            <div class="col col-md-12">
                 <div id="map"></div>
             </div>
         </div>

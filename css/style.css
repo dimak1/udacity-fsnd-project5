@@ -1,9 +1,26 @@
+/* GENERAL */
+
+a {}
+
+
+/* NAVBAR */
+
+.navbar-toggler {
+    line-height: inherit !important;
+}
+
 #map {
     height: 500px;
     width: 100%;
-    border: 1px solid black;
 }
 
-.attractions-list li {
-    /*list-style: none;*/
+.attraction-list img {
+    width: 15px;
+    vertical-align: baseline;
+    margin-right: 10px;
+}
+
+.city-list li,
+.attraction-list li {
+    list-style: none;
 }
