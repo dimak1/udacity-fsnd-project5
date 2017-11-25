@@ -20,7 +20,7 @@ function CityAttraction(marker, rating, address, icon) {
 var ViewModel = {
     currentCity: ko.observable(),
     cityAttractions: ko.observableArray([]),
-    cityList: ["Torotno", "New York", "Miami"]
+    cityList: ["Toronto", "New York", "Miami"]
 };
 
 ko.applyBindings(ViewModel)
@@ -60,7 +60,7 @@ function callback(results, status) {
 
 function createMarker(place) {
 
-    console.log(place);
+    // console.log(place);
 
     var marker = new google.maps.Marker({
         position: place.geometry.location,

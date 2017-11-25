@@ -2,6 +2,10 @@
 
 a {}
 
+ul {
+    margin-left: 0;
+}
+
 
 /* NAVBAR */
 
@@ -20,7 +24,14 @@ a {}
     margin-right: 10px;
 }
 
-.city-list li,
 .attraction-list li {
     list-style: none;
+}
+
+
+/* MODALs */
+
+.modal {
+    text-align: center;
+    vertical-align: middle;
 }

@@ -8,36 +8,31 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
         crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css" media="screen" title="no title">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" media="screen" title="no title">
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Attractions Finder</a>
         <span class="navbar-text">
-            Current City: <span id="current-city" class="text-primary" data-bind="text: currentCity"></span>
+            <span id="current-city" class="text-primary text-lg" data-bind="text: currentCity">Select City</span>
         </span>
-        <span><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#cities" aria-controls="attractions" aria-expanded="false" aria-label="Toggle navigation">
-            Select City
-        </button>
-        <button class="navbar-toggler text-success" type="button" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false"
+        <!-- <button class="btn btn-outline-success btn-sm" type="button" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false"
             aria-label="Toggle navigation" data-bind="enable: cityAttractions().length>0">
             View Attractions
-        </button></span>
+        </button> -->
     </nav>
-    <div class="collapse mt-2" id="attractions">
-        <div class="my-2 px-4">
+    <div class="container collapse mt-2" id="attractions">
+        <div class="my-2">
             <input class="form-control" type="search" placeholder="Search Attractions" aria-label="Search">
         </div>
-        <ul class="attraction-list" data-bind="foreach: cityAttractions">
-            <li class="py-1">
+        <dl class="attraction-list" data-bind="foreach: cityAttractions">
+            <dd class="">
                 <img data-bind="attr: {src: icon}" alt="" />
                 <a href="#" data-bind="text: name, click: showAttractionDetails"></a>
-                <span data-bind="text: rating" class="text-muted"></span>
-            </li>
-        </ul>
-    </div>
-    <div class="collapse city-list text-center" id="cities" data-bind="foreach: cityList">
-        <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)"></button>
+                <!-- <span data-bind="text: rating" class="text-muted"></span> -->
+            </dd>
+        </dl>
     </div>
     <div class="container-fluid pt-2">
         <div class="row">
@@ -46,6 +41,87 @@
             </div>
         </div>
     </div>
+
+    <div class="container fixed-bottom bg-light text-center">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-link" type="button" data-toggle="modal" data-target="#cityListModal">
+                    <i class="fa fa-map-o fa-lg p-3" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col">
+                <button class="btn btn-link" type="button" data-toggle="modal" data-target="#useCurrentLocationModal">
+                    <i class="fa fa-street-view fa-lg p-3" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col">
+                <!-- <button class="btn btn-link" type="button" data-toggle="modal" data-target="#useCurrentLocationModal">
+                    <i class="fa fa-street-view fa-lg p-3" aria-hidden="true"></i>
+                </button> -->
+                <button class="btn btn-link" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false" aria-label="Toggle navigation"
+                    data-bind="enable: cityAttractions().length>0">
+                    <i class="fa fa-list-ul fa-lg p-3"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALs -->
+    <div class="modal fade mt-5" id="cityListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select City</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="city-list text-center" id="cities" data-bind="foreach: cityList">
+                        <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)" data-dismiss="modal"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade mt-5" id="useCurrentLocationModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog text-center" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Use current location?</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade mt-5" id="attractionsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog text-center" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Attractions for <span data-bind="text: currentCity"></span></h5>
+                </div>
+                <div class="modal-body">
+                    <dl class="attraction-list" data-bind="foreach: cityAttractions">
+                        <dd class="">
+                            <img data-bind="attr: {src: icon}" alt="" />
+                            <a href="#" data-bind="text: name, click: showAttractionDetails" data-dismiss="modal"></a>
+                            <!-- <span data-bind="text: rating" class="text-muted"></span> -->
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <nav class="container nav-justified navbar fixed-bottom navbar-light bg-light">
+        <a><i class="fa fa-map-o fa-lg" aria-hidden="true"></i></a>
+                <span class="navbar-text">
+            <span id="current-city" class="text-primary" data-bind="text: currentCity"></span>
+                </span>
+                <div><i class="fa fa-map-o fa-lg" aria-hidden="true"></i></div>
+                </nav> -->
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -57,5 +133,7 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
     <script type="text/javascript" src="js/app.js"></script>
 </body>
+
+</html>
 
 </html>
