@@ -12,17 +12,27 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Attractions Finder</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+        <span class="navbar-brand">Attractions Finder</span>
         <span class="navbar-text">
-            <span id="current-city" class="text-primary text-lg" data-bind="text: currentCity">Select City</span>
+            <span id="current-city" class="text-danger text-uppercase" data-bind="text: currentCity">Select City</span>
         </span>
         <!-- <button class="btn btn-outline-success btn-sm" type="button" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false"
             aria-label="Toggle navigation" data-bind="enable: cityAttractions().length>0">
             View Attractions
         </button> -->
+        <div class="">
+            <button class="btn btn-link p-1" type="button" data-toggle="modal" data-target="#cityListModal">
+                <i class="fa fa-map-o fa-lg" aria-hidden="true"></i>
+                <span class="d-none d-md-inline d-lg-inline d-xl-inline ml-2">City</span>
+            </button>
+            <button class="btn btn-link p-1" type="button" data-toggle="modal" data-target="#attractionsModal" data-bind="enable: cityAttractions().length>0">
+                <i class="fa fa-list-ul fa-lg"></i>
+                <span class="d-none d-md-inline d-lg-inline d-xl-inline ml-2">Attractions</span>
+            </button>
+        </div>
     </nav>
-    <div class="container collapse mt-2" id="attractions">
+    <!-- <div class="container collapse mt-2" id="attractions">
         <div class="my-2">
             <input class="form-control" type="search" placeholder="Search Attractions" aria-label="Search">
         </div>
@@ -30,38 +40,13 @@
             <dd class="">
                 <img data-bind="attr: {src: icon}" alt="" />
                 <a href="#" data-bind="text: name, click: showAttractionDetails"></a>
-                <!-- <span data-bind="text: rating" class="text-muted"></span> -->
             </dd>
         </dl>
-    </div>
+    </div> -->
     <div class="container-fluid pt-2">
         <div class="row">
             <div class="col col-md-12">
                 <div id="map"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container fixed-bottom bg-light text-center">
-        <div class="row">
-            <div class="col">
-                <button class="btn btn-link" type="button" data-toggle="modal" data-target="#cityListModal">
-                    <i class="fa fa-map-o fa-lg p-3" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="col">
-                <button class="btn btn-link" type="button" data-toggle="modal" data-target="#useCurrentLocationModal">
-                    <i class="fa fa-street-view fa-lg p-3" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="col">
-                <!-- <button class="btn btn-link" type="button" data-toggle="modal" data-target="#useCurrentLocationModal">
-                    <i class="fa fa-street-view fa-lg p-3" aria-hidden="true"></i>
-                </button> -->
-                <button class="btn btn-link" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false" aria-label="Toggle navigation"
-                    data-bind="enable: cityAttractions().length>0">
-                    <i class="fa fa-list-ul fa-lg p-3"></i>
-                </button>
             </div>
         </div>
     </div>
@@ -74,7 +59,7 @@
                     <h5 class="modal-title">Select City</h5>
                 </div>
                 <div class="modal-body">
-                    <div class="city-list text-center" id="cities" data-bind="foreach: cityList">
+                    <div class="city-list" id="cities" data-bind="foreach: cityList">
                         <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)" data-dismiss="modal"></button>
                     </div>
                 </div>
@@ -82,31 +67,26 @@
         </div>
     </div>
 
-    <div class="modal fade mt-5" id="useCurrentLocationModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog text-center" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Use current location?</h5>
-                </div>
-                <div class="modal-body">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade mt-5" id="attractionsModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog text-center" role="document">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Attractions for <span data-bind="text: currentCity"></span></h5>
                 </div>
                 <div class="modal-body">
+                    <input class="form-control mb-3" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: searchString, valueUpdate: 'afterkeydown'">
+                    <span data-bind="text: filteredArray"></span>
+
+                    <!-- <dl class="attraction-list" data-bind="foreach: filteredAttractionsList">
+                        <dd class="">
+                            <a data-bind="text: name"></a>
+                        </dd>
+                    </dl> -->
+
                     <dl class="attraction-list" data-bind="foreach: cityAttractions">
                         <dd class="">
                             <img data-bind="attr: {src: icon}" alt="" />
-                            <a href="#" data-bind="text: name, click: showAttractionDetails" data-dismiss="modal"></a>
+                            <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
                             <!-- <span data-bind="text: rating" class="text-muted"></span> -->
                         </dd>
                     </dl>

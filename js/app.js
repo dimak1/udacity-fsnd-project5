@@ -1,9 +1,10 @@
 var city = "";
 var attractions = [];
 var infoWindow;
+var model;
 
 $(function() {
-    $('[data-toggle="tooltip"]').tooltip()
+    $("[data-toggle=\"tooltip\"]").tooltip()
 })
 
 // KNOCKOUT APP
@@ -17,13 +18,47 @@ function CityAttraction(marker, rating, address, icon) {
     this.icon = icon;
 }
 
-var ViewModel = {
-    currentCity: ko.observable(),
-    cityAttractions: ko.observableArray([]),
-    cityList: ["Toronto", "New York", "Miami"]
-};
+function filteredAttrations() {
+    return "something";
+}
 
-ko.applyBindings(ViewModel)
+function ViewModel() {
+    model = this;
+    model.currentCity = ko.observable();
+    model.cityAttractions = ko.observableArray([]);
+    model.cityList = ["Toronto", "New York", "Miami"];
+    model.searchString = ko.observable();
+    model.filteredArray = ko.computed(function() {
+        console.log(model.currentCity);
+        // return "city " + model.searchString();
+        return ko.utils.arrayFilter(model.cityAttractions(), function(data) {
+            data.name.toLowerCase().startsWith(model.searchString());
+        });
+    });
+}
+
+// var ViewModel = {
+//     currentCity: ko.observable(),
+//     cityAttractions: ko.observableArray([]),
+//     cityList: ["Toronto", "New York", "Miami"],
+//     searchString: ko.observable(),
+//     filteredArray: ko.computed(function() {
+//         console.log(this.cityAttractions);
+//         return ko.utils.arrayFilter(this.cityAttractions, function(data) {
+//             searchString = data.name;
+//         });
+//     }),
+//
+//     filteredAttractionsList: ko.computed({
+//         read: function() {
+//             console.log(this.cityAttractions);
+//             return "text " + this.cityAttractions;
+//         },
+//         write: this.cityAttractions
+//     })
+// };
+
+ko.applyBindings(new ViewModel());
 
 // GOOGLE MAP
 var map;
@@ -48,37 +83,39 @@ function initMap() {
 
 function callback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        ViewModel.cityAttractions([]);
+        // ViewModel.cityAttractions([]);
+        model.cityAttractions([]);
         for (var i = 0; i < results.length; i++) {
-            var place = results[i];
+            var attraction = results[i];
             // console.log(results[i]);
-            createMarker(results[i]);
+            createMarkerForAttraction(attraction);
             // var a = new CityAttraction(results[i].name);
         }
     }
 }
 
-function createMarker(place) {
+function createMarkerForAttraction(attraction) {
 
     // console.log(place);
 
     var marker = new google.maps.Marker({
-        position: place.geometry.location,
-        title: place.name,
+        position: attraction.geometry.location,
+        title: attraction.name,
         animation: google.maps.Animation.DROP,
         map: map
     });
 
     var cityAttration = new CityAttraction(marker,
-        place.rating, place.formatted_address, place.icon);
+        attraction.rating, attraction.formatted_address, attraction.icon);
 
-    ViewModel.cityAttractions.push(cityAttration);
+    model.cityAttractions.push(cityAttration);
+    // ViewModel.cityAttractions.push(cityAttration);
 }
 
 function selectCity(city) {
 
-    $('.collapse').collapse("hide");
-    ViewModel.currentCity(city);
+    // ViewModel.currentCity(city);
+    model.currentCity(city);
     var request = {
         query: city + "+point+of+interest",
         language: "en"
@@ -88,9 +125,9 @@ function selectCity(city) {
     service.textSearch(request, callback);
 }
 
-function showAttractionDetails() {
+function showAttractionDetailsOnTheMap() {
 
-    $('.collapse').collapse("hide");
+    // $('.collapse').collapse("hide");
 
     infoWindow.close();
     var self = this.marker;

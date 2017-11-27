@@ -13,6 +13,11 @@ ul {
     line-height: inherit !important;
 }
 
+.navbar>button {
+    text-decoration: none;
+    cursor: pointer;
+}
+
 #map {
     height: 500px;
     width: 100%;
@@ -32,6 +37,5 @@ ul {
 /* MODALs */
 
 .modal {
-    text-align: center;
     vertical-align: middle;
 }
