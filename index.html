@@ -75,7 +75,13 @@
                 </div>
                 <div class="modal-body">
                     <input class="form-control mb-3" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: searchString, valueUpdate: 'afterkeydown'">
-                    <span data-bind="text: filteredArray"></span>
+                    <dl class="attraction-list" data-bind="foreach: filteredArray">
+                        <dd class="">
+                            <img data-bind="attr: {src: icon}" alt="" />
+                            <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
+                            <!-- <span data-bind="text: rating" class="text-muted"></span> -->
+                        </dd>
+                    </dl>
 
                     <!-- <dl class="attraction-list" data-bind="foreach: filteredAttractionsList">
                         <dd class="">
@@ -83,13 +89,12 @@
                         </dd>
                     </dl> -->
 
-                    <dl class="attraction-list" data-bind="foreach: cityAttractions">
+                    <!-- <dl class="attraction-list" data-bind="foreach: cityAttractions">
                         <dd class="">
                             <img data-bind="attr: {src: icon}" alt="" />
                             <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
-                            <!-- <span data-bind="text: rating" class="text-muted"></span> -->
                         </dd>
-                    </dl>
+                    </dl> -->
                 </div>
             </div>
         </div>

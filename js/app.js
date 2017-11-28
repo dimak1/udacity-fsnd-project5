@@ -8,7 +8,7 @@ $(function() {
 })
 
 // KNOCKOUT APP
-function CityAttraction(marker, rating, address, icon) {
+function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
     // var self = this;
     this.name = marker.getTitle();
     // self.location = marker.getPosition();
@@ -16,23 +16,26 @@ function CityAttraction(marker, rating, address, icon) {
     this.rating = rating;
     this.address = address;
     this.icon = icon;
+    this.isOpenNow = isOpenNow;
+    this.placeId = placeId;
 }
 
-function filteredAttrations() {
-    return "something";
-}
+// var markerOptions = new google.maps.markerOptions({});
 
 function ViewModel() {
     model = this;
     model.currentCity = ko.observable();
     model.cityAttractions = ko.observableArray([]);
     model.cityList = ["Toronto", "New York", "Miami"];
-    model.searchString = ko.observable();
+    model.searchString = ko.observable("");
     model.filteredArray = ko.computed(function() {
-        console.log(model.currentCity);
         // return "city " + model.searchString();
         return ko.utils.arrayFilter(model.cityAttractions(), function(data) {
-            data.name.toLowerCase().startsWith(model.searchString());
+            if (data.name.toLowerCase().startsWith(model.searchString())) {
+                return true;
+            } else {
+                return false;
+            }
         });
     });
 }
@@ -75,46 +78,11 @@ function initMap() {
         zoom: 13,
         center: toronto
     });
-    var marker = new google.maps.Marker({
-        position: toronto,
-        map: map
-    });
 }
 
-function callback(results, status) {
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
-        // ViewModel.cityAttractions([]);
-        model.cityAttractions([]);
-        for (var i = 0; i < results.length; i++) {
-            var attraction = results[i];
-            // console.log(results[i]);
-            createMarkerForAttraction(attraction);
-            // var a = new CityAttraction(results[i].name);
-        }
-    }
-}
-
-function createMarkerForAttraction(attraction) {
-
-    // console.log(place);
-
-    var marker = new google.maps.Marker({
-        position: attraction.geometry.location,
-        title: attraction.name,
-        animation: google.maps.Animation.DROP,
-        map: map
-    });
-
-    var cityAttration = new CityAttraction(marker,
-        attraction.rating, attraction.formatted_address, attraction.icon);
-
-    model.cityAttractions.push(cityAttration);
-    // ViewModel.cityAttractions.push(cityAttration);
-}
-
+// Select city from the list in modal
 function selectCity(city) {
 
-    // ViewModel.currentCity(city);
     model.currentCity(city);
     var request = {
         query: city + "+point+of+interest",
@@ -122,22 +90,91 @@ function selectCity(city) {
     }
 
     service = new google.maps.places.PlacesService(map);
-    service.textSearch(request, callback);
+    service.textSearch(request, citySearchCallback);
 }
 
-function showAttractionDetailsOnTheMap() {
+// Get attractions from city textSearch and create markers for map
+function citySearchCallback(results, status) {
 
-    // $('.collapse').collapse("hide");
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        // Clear city attractions
+        model.cityAttractions([]);
+        for (var i = 0; i < results.length; i++) {
+            var attraction = results[i];
+            // console.log(results[i]);
+            createMarkerForAttraction(attraction);
+        }
+    }
+}
+
+function createMarkerForAttraction(attraction) {
+
+    // Create marker on the map
+    var marker = new google.maps.Marker({
+        position: attraction.geometry.location,
+        title: attraction.name,
+        animation: google.maps.Animation.DROP,
+        map: map
+    });
+
+    // Create CityAttraction object based on attraction info
+    var cityAttration = new CityAttraction(marker,
+        attraction.rating, attraction.formatted_address, attraction.icon,
+        (attraction.opening_hours === undefined) ? false : attraction.opening_hours.open_now, attraction.place_id);
+
+    // Add cityAttration to list of attractions
+    model.cityAttractions.push(cityAttration);
+
+    // Add click event to the marker
+    marker.addListener("click", function() {
+        showAttractionDetailsOnTheMap(cityAttration);
+    });
+}
+
+// Show attraction details in infoWindow on the map
+function showAttractionDetailsOnTheMap(cityAttration) {
+
+    // Close any open infoWindow
+    infoWindow.close();
+
+    var marker = cityAttration.marker;
+
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+
+    setTimeout((function() {
+        marker.setAnimation(null);
+    }).bind(marker), 1400);
+
+    map.panTo(marker.getPosition());
+
+    createAndOpenInfoWindow(cityAttration);
+}
+
+// Create InfoWindow and open it on the Map
+function createAndOpenInfoWindow(attraction) {
+
+    var request = {
+        placeId: attraction.placeId
+    };
 
     infoWindow.close();
-    var self = this.marker;
-    // var location = this.location;
-    self.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout((function() {
-        self.setAnimation(null);
-    }).bind(self), 1400);
-    map.panTo(self.getPosition());
+    infoWindow.setContent("<div class=\"text-muted p-2\">Loading...</div>");
+    service = new google.maps.places.PlacesService(map);
+    // console.log("Get place details");
+    service.getDetails(request, placeDetailsCallback);
+    infoWindow.open(map, attraction.marker);
+}
 
-    infoWindow.setContent(self.getTitle() + "<br/>" + this.address);
-    infoWindow.open(map, self);
+function placeDetailsCallback(place, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        // console.log(place);
+
+        var TITLE = "<h6 class=\"info-title text-primary\">" + place.name + "</h6>";
+        var ADDRESS = "<div class=\"info-address text-secondary\">" + place.formatted_address + "</div>";
+        // var OPEN_OR_CLOSED = (attraction.isOpenNow === true) ?
+        var OPEN_OR_CLOSED = (place.opening_hours !== undefined && place.opening_hours.open_now == true) ?
+            "<div class=\"info-open text-success p-1\">Now Open</div>" : "<div class=\"info-open text-danger p-1\">Now Closed</div>";
+
+        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED);
+    }
 }
