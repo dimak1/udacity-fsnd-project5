@@ -38,6 +38,7 @@ function ViewModel() {
             }
         });
     });
+    model.attractionPhotos = ko.observableArray([]);
 }
 
 // var ViewModel = {
@@ -133,7 +134,7 @@ function createMarkerForAttraction(attraction) {
 
 // Show attraction details in infoWindow on the map
 function showAttractionDetailsOnTheMap(cityAttration) {
-
+    console.log("Show attraction details");
     // Close any open infoWindow
     infoWindow.close();
 
@@ -161,20 +162,27 @@ function createAndOpenInfoWindow(attraction) {
     infoWindow.setContent("<div class=\"text-muted p-2\">Loading...</div>");
     service = new google.maps.places.PlacesService(map);
     // console.log("Get place details");
-    service.getDetails(request, placeDetailsCallback);
+    var placeResult = service.getDetails(request, placeDetailsCallback);
     infoWindow.open(map, attraction.marker);
 }
 
 function placeDetailsCallback(place, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        // console.log(place);
+        console.log(place);
 
         var TITLE = "<h6 class=\"info-title text-primary\">" + place.name + "</h6>";
         var ADDRESS = "<div class=\"info-address text-secondary\">" + place.formatted_address + "</div>";
         // var OPEN_OR_CLOSED = (attraction.isOpenNow === true) ?
         var OPEN_OR_CLOSED = (place.opening_hours !== undefined && place.opening_hours.open_now == true) ?
             "<div class=\"info-open text-success p-1\">Now Open</div>" : "<div class=\"info-open text-danger p-1\">Now Closed</div>";
+        var PHONE = "<div class=\"text-info\">" + place.formatted_phone_number + "</div>";
+        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotos\">View Photos</button>";
 
-        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED);
+        for (var i = 0; i < place.photos.length; i++) {
+            console.log(place.photos[i].getUrl());
+            // model.attractionPhotos(place.photos);
+        }
+
+        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED + PHONE + VIEW_PHOTOS_BTN);
     }
 }
