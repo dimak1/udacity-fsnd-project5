@@ -2,6 +2,7 @@ var city = "";
 var attractions = [];
 var infoWindow;
 var model;
+var placePhotos = [];
 
 $(function() {
     $("[data-toggle=\"tooltip\"]").tooltip()
@@ -39,6 +40,7 @@ function ViewModel() {
         });
     });
     model.attractionPhotos = ko.observableArray([]);
+    model.attractionReviews = ko.observableArray([]);
 }
 
 // var ViewModel = {
@@ -162,27 +164,42 @@ function createAndOpenInfoWindow(attraction) {
     infoWindow.setContent("<div class=\"text-muted p-2\">Loading...</div>");
     service = new google.maps.places.PlacesService(map);
     // console.log("Get place details");
-    var placeResult = service.getDetails(request, placeDetailsCallback);
+    service.getDetails(request, placeDetailsCallback);
     infoWindow.open(map, attraction.marker);
 }
 
+// Get place details and add them to infoWindow
 function placeDetailsCallback(place, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        console.log(place);
 
         var TITLE = "<h6 class=\"info-title text-primary\">" + place.name + "</h6>";
         var ADDRESS = "<div class=\"info-address text-secondary\">" + place.formatted_address + "</div>";
-        // var OPEN_OR_CLOSED = (attraction.isOpenNow === true) ?
         var OPEN_OR_CLOSED = (place.opening_hours !== undefined && place.opening_hours.open_now == true) ?
             "<div class=\"info-open text-success p-1\">Now Open</div>" : "<div class=\"info-open text-danger p-1\">Now Closed</div>";
-        var PHONE = "<div class=\"text-info\">" + place.formatted_phone_number + "</div>";
-        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotos\">View Photos</button>";
+        var PHONE = "<div class=\"text-info py-1\"><i class=\"fa fa-phone pr-1\" aria-hidden=\"true\"></i>" + place.formatted_phone_number + "</div>";
+        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotos\">View Photos</button>";
+        var READ_REVIEWS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionReviews\">Read Reviews</button>";
 
+        // Clear attraction photos and reviews
+        model.attractionPhotos([]);
+        model.attractionReviews([]);
+
+        // Populate attractionPhotos
         for (var i = 0; i < place.photos.length; i++) {
-            console.log(place.photos[i].getUrl());
-            // model.attractionPhotos(place.photos);
+            var placePhoto = place.photos[i];
+            var url = placePhoto.getUrl({
+                maxWidth: 600,
+                maxHeight: 400
+            });
+            model.attractionPhotos.push(url);
         }
 
-        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED + PHONE + VIEW_PHOTOS_BTN);
+        // Populate attractionReviews
+        for (var i = 0; i < place.reviews.length; i++) {
+            var review = place.reviews[i];
+            model.attractionReviews.push(review);
+        }
+
+        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED + PHONE + VIEW_PHOTOS_BTN + READ_REVIEWS_BTN);
     }
 }

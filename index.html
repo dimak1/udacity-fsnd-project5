@@ -17,10 +17,6 @@
         <span class="navbar-text">
             <span id="current-city" class="text-danger text-uppercase" data-bind="text: currentCity">Select City</span>
         </span>
-        <!-- <button class="btn btn-outline-success btn-sm" type="button" data-toggle="collapse" data-target="#attractions" aria-controls="attractions" aria-expanded="false"
-            aria-label="Toggle navigation" data-bind="enable: cityAttractions().length>0">
-            View Attractions
-        </button> -->
         <div class="">
             <button class="btn btn-link p-1" type="button" data-toggle="modal" data-target="#cityListModal">
                 <i class="fa fa-map-o fa-lg" aria-hidden="true"></i>
@@ -32,17 +28,6 @@
             </button>
         </div>
     </nav>
-    <!-- <div class="container collapse mt-2" id="attractions">
-        <div class="my-2">
-            <input class="form-control" type="search" placeholder="Search Attractions" aria-label="Search">
-        </div>
-        <dl class="attraction-list" data-bind="foreach: cityAttractions">
-            <dd class="">
-                <img data-bind="attr: {src: icon}" alt="" />
-                <a href="#" data-bind="text: name, click: showAttractionDetails"></a>
-            </dd>
-        </dl>
-    </div> -->
     <div class="container-fluid pt-2">
         <div class="row">
             <div class="col col-md-12">
@@ -57,11 +42,17 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Select City</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="city-list" id="cities" data-bind="foreach: cityList">
                         <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)" data-dismiss="modal"></button>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -72,6 +63,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Attractions for <span data-bind="text: currentCity"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <input class="form-control mb-3" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: searchString, valueUpdate: 'afterkeydown'">
@@ -79,51 +73,68 @@
                         <dd class="">
                             <img data-bind="attr: {src: icon}" alt="" />
                             <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
-                            <!-- <span data-bind="text: rating" class="text-muted"></span> -->
                         </dd>
                     </dl>
-
-                    <!-- <dl class="attraction-list" data-bind="foreach: filteredAttractionsList">
-                        <dd class="">
-                            <a data-bind="text: name"></a>
-                        </dd>
-                    </dl> -->
-
-                    <!-- <dl class="attraction-list" data-bind="foreach: cityAttractions">
-                        <dd class="">
-                            <img data-bind="attr: {src: icon}" alt="" />
-                            <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
-                        </dd>
-                    </dl> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="modal fade mt-5" id="attractionPhotos" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Photos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="city-list" id="" data-bind="foreach: attractionPhotos">
-                        <div class="" data-bind="text: name">
-                        </div>
+                        <img class="attraction-photo py-2" data-bind="attr: {src: $data}"></img>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- <nav class="container nav-justified navbar fixed-bottom navbar-light bg-light">
-        <a><i class="fa fa-map-o fa-lg" aria-hidden="true"></i></a>
-                <span class="navbar-text">
-            <span id="current-city" class="text-primary" data-bind="text: currentCity"></span>
-                </span>
-                <div><i class="fa fa-map-o fa-lg" aria-hidden="true"></i></div>
-                </nav> -->
-
+    <div class="modal fade mt-5" id="attractionReviews" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reviews</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="city-list" id="" data-bind="foreach: attractionReviews">
+                        <div class="pb-4">
+                            <div class="review-text">
+                                <i class="fa fa-quote-left text-info pr-1" aria-hidden="true"></i>
+                                <span data-bind="text: text"></span>
+                                <i class="fa fa-quote-right text-info pl-1" aria-hidden="true"></i>
+                            </div>
+                            <div class="review-cred pt-2">
+                                <i class="fa fa-user text-dark pr-1" aria-hidden="true"></i><span class="text-dark" data-bind="text: author_name"></span>
+                                <i class="fa fa-star text-primary pl-2 pr-1" aria-hidden="true"></i><span class="text-primary" data-bind="text: rating"></span>
+                                <span class="pl-2 text-secondary" data-bind="text: relative_time_description"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"

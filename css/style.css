@@ -1,6 +1,10 @@
 /* GENERAL */
 
-a {}
+a,
+.btn-link {
+    text-decoration: none !important;
+    cursor: pointer;
+}
 
 ul {
     margin-left: 0;
@@ -13,24 +17,12 @@ ul {
     line-height: inherit !important;
 }
 
-.navbar>button {
-    text-decoration: none;
-    cursor: pointer;
-}
+
+/* MAP */
 
 #map {
     height: 500px;
     width: 100%;
-}
-
-.attraction-list img {
-    width: 15px;
-    vertical-align: baseline;
-    margin-right: 10px;
-}
-
-.attraction-list li {
-    list-style: none;
 }
 
 
@@ -47,4 +39,30 @@ ul {
 
 .modal {
     vertical-align: middle;
+}
+
+.attraction-list img {
+    width: 15px;
+    vertical-align: baseline;
+    margin-right: 10px;
+}
+
+.attraction-list li {
+    list-style: none;
+}
+
+.attraction-photo {
+    width: 100%;
+}
+
+.review-text {
+    font-size: 15px;
+    line-height: 20px;
+    text-align: justify;
+    font-weight: 100;
+}
+
+.review-cred {
+    text-align: right;
+    font-size: 13px;
 }
