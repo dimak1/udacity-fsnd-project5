@@ -41,6 +41,7 @@ function ViewModel() {
     });
     model.attractionPhotos = ko.observableArray([]);
     model.attractionReviews = ko.observableArray([]);
+    model.errorMessage = ko.observable();
 }
 
 // var ViewModel = {
@@ -81,6 +82,7 @@ function initMap() {
         zoom: 13,
         center: toronto
     });
+
 }
 
 // Select city from the list in modal
@@ -91,7 +93,7 @@ function selectCity(city) {
         query: city + "+point+of+interest",
         language: "en"
     }
-
+    console.log("Call select city");
     service = new google.maps.places.PlacesService(map);
     service.textSearch(request, citySearchCallback);
 }
@@ -107,6 +109,8 @@ function citySearchCallback(results, status) {
             // console.log(results[i]);
             createMarkerForAttraction(attraction);
         }
+    } else {
+        showErrorMessage("Error retriveing " + model.currentCity() + " attractions.", status);
     }
 }
 
@@ -177,8 +181,8 @@ function placeDetailsCallback(place, status) {
         var OPEN_OR_CLOSED = (place.opening_hours !== undefined && place.opening_hours.open_now == true) ?
             "<div class=\"info-open text-success p-1\">Now Open</div>" : "<div class=\"info-open text-danger p-1\">Now Closed</div>";
         var PHONE = "<div class=\"text-info py-1\"><i class=\"fa fa-phone pr-1\" aria-hidden=\"true\"></i>" + place.formatted_phone_number + "</div>";
-        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotos\">View Photos</button>";
-        var READ_REVIEWS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionReviews\">Read Reviews</button>";
+        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotosModal\">View Photos</button>";
+        var READ_REVIEWS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionReviewsModal\">Read Reviews</button>";
 
         // Clear attraction photos and reviews
         model.attractionPhotos([]);
@@ -201,5 +205,30 @@ function placeDetailsCallback(place, status) {
         }
 
         infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED + PHONE + VIEW_PHOTOS_BTN + READ_REVIEWS_BTN);
+    } else {
+        showErrorMessage("Error retriveing " + place.name() + " details.", status);
     }
+}
+
+// Hide any visible modals and display error message in modal
+function showErrorMessage(errorMessage, status) {
+    console.log("Show error");
+    if ($('.app-modal').hasClass('in') == false) {
+        var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
+        model.errorMessage(msg);
+        $('#errorModal').modal('show');
+        return;
+    } else {
+        console.log("finished hiding modal");
+        $('.app-modal').on('hidden.bs.modal', function() {
+
+            var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
+            model.errorMessage(msg);
+            $('#errorModal').modal('show');
+        });
+    }
+}
+
+function gm_authFailure() {
+    showErrorMessage("Error loading Google Maps", "");
 }
