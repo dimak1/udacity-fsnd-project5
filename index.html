@@ -17,7 +17,7 @@
         <span class="navbar-text">
             <span id="current-city" class="text-danger text-uppercase" data-bind="text: currentCity">Select City</span>
         </span>
-        <div class="">
+        <div>
             <button class="btn btn-link p-1" type="button" data-toggle="modal" data-target="#cityListModal">
                 <i class="fa fa-map-o fa-lg" aria-hidden="true"></i>
                 <span class="d-none d-md-inline d-lg-inline d-xl-inline ml-2">City</span>
@@ -47,7 +47,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="city-list" id="cities" data-bind="foreach: cityList">
+                    <div id="cities" data-bind="foreach: cityList">
                         <button type="button" class="btn btn-link" data-bind="text: $data, click: selectCity.bind($data)" data-dismiss="modal"></button>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                 </div>
                 <div class="modal-body">
                     <input class="form-control mb-3" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: searchString, valueUpdate: 'afterkeydown'">
-                    <dl class="attraction-list" data-bind="foreach: filteredArray">
-                        <dd class="">
+                    <dl class="attraction-list" data-bind="foreach: filteredAttractionList">
+                        <dd>
                             <img data-bind="attr: {src: icon}" alt="" />
                             <a href="#" data-bind="text: name, click: showAttractionDetailsOnTheMap" data-dismiss="modal"></a>
                         </dd>
@@ -93,7 +93,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="city-list" id="" data-bind="foreach: attractionPhotos">
+                    <div data-bind="foreach: attractionPhotos">
                         <img class="attraction-photo py-2" data-bind="attr: {src: $data}"></img>
                     </div>
                 </div>
@@ -108,13 +108,16 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Reviews</h5>
+                    <h5 class="modal-title">Info & Reviews</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="city-list" id="" data-bind="foreach: attractionReviews">
+                    <div class="desc-text pb-3">
+                        <i class="fa fa-info-circle text-primary pr-1" aria-hidden="true"></i><span data-bind="text: attractionDesc"></span>
+                    </div>
+                    <div data-bind="foreach: attractionReviews">
                         <div class="pb-4">
                             <div class="review-text">
                                 <i class="fa fa-quote-left text-info pr-1" aria-hidden="true"></i>
@@ -122,9 +125,9 @@
                                 <i class="fa fa-quote-right text-info pl-1" aria-hidden="true"></i>
                             </div>
                             <div class="review-cred pt-2">
-                                <i class="fa fa-user text-dark pr-1" aria-hidden="true"></i><span class="text-dark" data-bind="text: author_name"></span>
-                                <i class="fa fa-star text-primary pl-2 pr-1" aria-hidden="true"></i><span class="text-primary" data-bind="text: rating"></span>
-                                <span class="pl-2 text-secondary" data-bind="text: relative_time_description"></span>
+                                <i class="fa fa-user text-dark pr-1" aria-hidden="true"></i><span data-bind="text: author_name"></span>
+                                <i class="fa fa-star text-primary pl-2 pr-1" aria-hidden="true"></i><span data-bind="text: rating"></span>
+                                <span class="pl-2 text-secondary"><i class="fa fa-calendar pr-1" aria-hidden="true"></i><span data-bind="text: relative_time_description"></span></span>
                             </div>
                         </div>
                     </div>
@@ -152,7 +155,7 @@
                             <i class="fa fa-exclamation-triangle fa-lg text-danger pr-2" aria-hidden="true"></i>
                         </div>
                         <div class="col col-md-11">
-                            <div class="" data-bind="html: errorMessage"></div>
+                            <div data-bind="html: errorMessage"></div>
                         </div>
                     </div>
                 </div>
@@ -170,9 +173,10 @@
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
 </body>
 
 </html>
 
 </html>
+>

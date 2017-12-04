@@ -1,35 +1,39 @@
-var city = "";
-var attractions = [];
 var infoWindow;
 var model;
-var placePhotos = [];
+var markers = [];
 
-$(function() {
-    $("[data-toggle=\"tooltip\"]").tooltip()
-})
+// $(function() {
+//     $("[data-toggle=\"tooltip\"]").tooltip()
+// })
 
 // KNOCKOUT APP
 function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
-    // var self = this;
+
     this.name = marker.getTitle();
-    // self.location = marker.getPosition();
     this.marker = marker;
     this.rating = rating;
     this.address = address;
     this.icon = icon;
     this.isOpenNow = isOpenNow;
     this.placeId = placeId;
+    this.phone = "";
+
+    // data to be populated from Facebook Graph API
+    this.desc = "";
+    this.checkinsCount = "";
+    this.priceRange = "";
 }
 
 // var markerOptions = new google.maps.markerOptions({});
 
 function ViewModel() {
     model = this;
+    model.currentAttraction = ko.observable();
     model.currentCity = ko.observable();
     model.cityAttractions = ko.observableArray([]);
     model.cityList = ["Toronto", "New York", "Miami"];
     model.searchString = ko.observable("");
-    model.filteredArray = ko.computed(function() {
+    model.filteredAttractionList = ko.computed(function() {
         // return "city " + model.searchString();
         return ko.utils.arrayFilter(model.cityAttractions(), function(data) {
             if (data.name.toLowerCase().startsWith(model.searchString())) {
@@ -41,29 +45,9 @@ function ViewModel() {
     });
     model.attractionPhotos = ko.observableArray([]);
     model.attractionReviews = ko.observableArray([]);
+    model.attractionDesc = ko.observable();
     model.errorMessage = ko.observable();
 }
-
-// var ViewModel = {
-//     currentCity: ko.observable(),
-//     cityAttractions: ko.observableArray([]),
-//     cityList: ["Toronto", "New York", "Miami"],
-//     searchString: ko.observable(),
-//     filteredArray: ko.computed(function() {
-//         console.log(this.cityAttractions);
-//         return ko.utils.arrayFilter(this.cityAttractions, function(data) {
-//             searchString = data.name;
-//         });
-//     }),
-//
-//     filteredAttractionsList: ko.computed({
-//         read: function() {
-//             console.log(this.cityAttractions);
-//             return "text " + this.cityAttractions;
-//         },
-//         write: this.cityAttractions
-//     })
-// };
 
 ko.applyBindings(new ViewModel());
 
@@ -74,28 +58,58 @@ function initMap() {
 
     infoWindow = new google.maps.InfoWindow();
 
-    var toronto = {
-        "lat": 43.653226,
-        "lng": -79.3831843
-    };
+    // Initial Location is Toronto, Canada
+    // var initialLocation = {
+    //     "lat": 43.653226,
+    //     "lng": -79.3831843
+    // };
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
-        center: toronto
+        zoom: 13
+        // center: initialLocation
     });
 
+    selectCity(model.cityList[0]);
+}
+
+function clearMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers = [];
 }
 
 // Select city from the list in modal
 function selectCity(city) {
 
+    clearMarkers();
+
     model.currentCity(city);
-    var request = {
-        query: city + "+point+of+interest",
-        language: "en"
-    }
-    console.log("Call select city");
-    service = new google.maps.places.PlacesService(map);
-    service.textSearch(request, citySearchCallback);
+
+    var geocoder = new google.maps.Geocoder();
+
+    // Get coordinated for the city
+    geocoder.geocode({
+        'address': city
+    }, function(results, status) {
+        if (status === 'OK') {
+            map.setCenter(results[0].geometry.location);
+
+            var request = {
+                query: city + "+point+of+interest"
+            }
+
+            try {
+                // Seatch all attractions (point of interest) for the city
+                service = new google.maps.places.PlacesService(map);
+                service.textSearch(request, citySearchCallback);
+            } catch (error) {
+                showErrorMessage("Error retriveing " + model.currentCity() + " attractions. Check if Google Places Service is enabled.", error.message)
+            }
+
+        } else {
+            showErrorMessage('Geocode was not successful.', status);
+        }
+    });
 }
 
 // Get attractions from city textSearch and create markers for map
@@ -132,6 +146,8 @@ function createMarkerForAttraction(attraction) {
     // Add cityAttration to list of attractions
     model.cityAttractions.push(cityAttration);
 
+    markers.push(marker);
+
     // Add click event to the marker
     marker.addListener("click", function() {
         showAttractionDetailsOnTheMap(cityAttration);
@@ -140,12 +156,10 @@ function createMarkerForAttraction(attraction) {
 
 // Show attraction details in infoWindow on the map
 function showAttractionDetailsOnTheMap(cityAttration) {
-    console.log("Show attraction details");
-    // Close any open infoWindow
-    infoWindow.close();
+
+    model.currentAttraction(cityAttration);
 
     var marker = cityAttration.marker;
-
     marker.setAnimation(google.maps.Animation.BOUNCE);
 
     setTimeout((function() {
@@ -164,25 +178,51 @@ function createAndOpenInfoWindow(attraction) {
         placeId: attraction.placeId
     };
 
-    infoWindow.close();
-    infoWindow.setContent("<div class=\"text-muted p-2\">Loading...</div>");
-    service = new google.maps.places.PlacesService(map);
-    // console.log("Get place details");
-    service.getDetails(request, placeDetailsCallback);
-    infoWindow.open(map, attraction.marker);
+    try {
+        infoWindow.close();
+        // Set Loading indicator for inforWindow
+        infoWindow.setContent("<div class=\"text-muted p-2\">Loading...</div>");
+        infoWindow.open(map, attraction.marker);
+        service = new google.maps.places.PlacesService(map);
+        // Get details about place
+        service.getDetails(request, placeDetailsCallback);
+
+    } catch (error) {
+        showErrorMessage("Error retriveing " + attraction.name + " details.", error.message);
+    }
 }
 
 // Get place details and add them to infoWindow
 function placeDetailsCallback(place, status) {
+
     if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-        var TITLE = "<h6 class=\"info-title text-primary\">" + place.name + "</h6>";
-        var ADDRESS = "<div class=\"info-address text-secondary\">" + place.formatted_address + "</div>";
-        var OPEN_OR_CLOSED = (place.opening_hours !== undefined && place.opening_hours.open_now == true) ?
-            "<div class=\"info-open text-success p-1\">Now Open</div>" : "<div class=\"info-open text-danger p-1\">Now Closed</div>";
-        var PHONE = "<div class=\"text-info py-1\"><i class=\"fa fa-phone pr-1\" aria-hidden=\"true\"></i>" + place.formatted_phone_number + "</div>";
-        var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotosModal\">View Photos</button>";
-        var READ_REVIEWS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionReviewsModal\">Read Reviews</button>";
+        var attraction = model.currentAttraction();
+        attraction.phone = place.formatted_phone_number;
+
+        var lat = attraction.marker.position.lat();
+        var lng = attraction.marker.position.lng()
+
+        // Call Facebook API to get additional info about Attraction
+        $.getJSON("https://graph.facebook.com/v2.11/search?access_token=1486474141471469%7CCzrnnI77lBmR9Y9s2-LEgHOQ_g4&type=place&center=" +
+                lat + "," + lng + "&fields=name,price_range,checkins,description",
+                function(result) {
+                    $.each(result.data, function(index, place) {
+                        if (place.name.indexOf(attraction.name) >= 0) {
+                            attraction.desc = place.description || "No info available.";
+                            // Add desctiption to the model to be available in modal
+                            model.attractionDesc(attraction.desc);
+                            attraction.checkinsCount = place.checkins;
+                            attraction.priceRange = place.price_range || "";
+                            return false;
+                        }
+                    });
+                })
+            .done(function() {
+                infoWindow.setContent(createInfoWindowContent(attraction));
+            }).fail(function(error) {
+                showErrorMessage("Error getting information from Facebook.", error);
+            });
 
         // Clear attraction photos and reviews
         model.attractionPhotos([]);
@@ -203,32 +243,36 @@ function placeDetailsCallback(place, status) {
             var review = place.reviews[i];
             model.attractionReviews.push(review);
         }
-
-        infoWindow.setContent(TITLE + ADDRESS + OPEN_OR_CLOSED + PHONE + VIEW_PHOTOS_BTN + READ_REVIEWS_BTN);
     } else {
-        showErrorMessage("Error retriveing " + place.name() + " details.", status);
+        showErrorMessage("Error retriveing " + place.name + " details.", status);
     }
 }
 
-// Hide any visible modals and display error message in modal
+// Create content for InfoWindow
+function createInfoWindowContent(attraction) {
+
+    var TITLE = "<span class=\"h6 info-title text-primary\">" + attraction.name + "</span><span class=\"px-2\">" + attraction.rating + "</span><span>" + attraction.priceRange + "</span>";
+    var DESC = "<div class=\"info-address text-secondary\">" + attraction.desc + "</div>";
+    var ADDRESS = "<div class=\"info-address text-secondary py-1\">" + attraction.address + "</div>";
+    var OPEN_OR_CLOSED = (attraction.isOpenNow == true) ?
+        "<span class=\"info-open text-success p-1 px-2\"><i class=\"fa fa-clock-o pr-1\" aria-hidden=\"true\"></i>Now Open</span>" : "<span class=\"info-open text-danger p-1 px-2\"><i class=\"fa fa-clock-o pr-1\" aria-hidden=\"true\"></i>Now Closed</span>";
+    var CHECKINS = "<span class=\"text-info\"><i class=\"fa fa-facebook pr-1\" aria-hidden=\"true\"></i>Check-ins: " + attraction.checkinsCount + "</span>";
+    var PHONE = "<div class=\"text-dark py-1\"><i class=\"fa fa-phone pr-1\" aria-hidden=\"true\"></i>" + attraction.phone + "</div>";
+    var VIEW_PHOTOS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionPhotosModal\">Photos</button>";
+    var READ_REVIEWS_BTN = "<button class=\"btn btn-link text-success p-1\" type=\"button\" data-toggle=\"modal\" data-target=\"#attractionReviewsModal\">Info & Reviews</button>";
+
+    return TITLE + ADDRESS + OPEN_OR_CLOSED + CHECKINS + PHONE + READ_REVIEWS_BTN + VIEW_PHOTOS_BTN;
+}
+
+// Hide any visible modals and display error message via modal
 function showErrorMessage(errorMessage, status) {
-    console.log("Show error");
-    if ($('.app-modal').hasClass('in') == false) {
-        var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
-        model.errorMessage(msg);
-        $('#errorModal').modal('show');
-        return;
-    } else {
-        console.log("finished hiding modal");
-        $('.app-modal').on('hidden.bs.modal', function() {
-
-            var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
-            model.errorMessage(msg);
-            $('#errorModal').modal('show');
-        });
-    }
+    infoWindow.close();
+    var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
+    model.errorMessage(msg);
+    $('#errorModal').modal('show');
 }
 
+// Google Maps error
 function gm_authFailure() {
     showErrorMessage("Error loading Google Maps", "");
 }

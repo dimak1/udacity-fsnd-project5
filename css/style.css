@@ -32,8 +32,6 @@ ul {
     text-align: center;
 }
 
-.info-title {}
-
 
 /* MODALs */
 
@@ -55,9 +53,16 @@ ul {
     width: 100%;
 }
 
-.review-text {
+.desc-text {
     font-size: 15px;
     line-height: 20px;
+    text-align: justify;
+    font-weight: 100;
+}
+
+.review-text {
+    font-size: 13px;
+    line-height: 18px;
     text-align: justify;
     font-weight: 100;
 }
