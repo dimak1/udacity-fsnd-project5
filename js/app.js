@@ -1,12 +1,14 @@
+// Full Stack Nanodegree Program - Udacity
+// Project 5 - Neighborhood Map
+// Author - Dima K
+// Date - Dec 2017
+
 var infoWindow;
 var model;
 var markers = [];
+var map;
 
-// $(function() {
-//     $("[data-toggle=\"tooltip\"]").tooltip()
-// })
-
-// KNOCKOUT APP
+// City Attraction class
 function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
 
     this.name = marker.getTitle();
@@ -24,6 +26,7 @@ function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
     this.priceRange = "";
 }
 
+// knockout View Model with observables
 function ViewModel() {
     model = this;
     model.currentAttraction = ko.observable();
@@ -48,20 +51,17 @@ function ViewModel() {
 
 ko.applyBindings(new ViewModel());
 
-// GOOGLE MAP
-var map;
-
+// Call this method when Google Map Api is loaded
 function initMap() {
-
     infoWindow = new google.maps.InfoWindow();
-
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13
     });
-
+    // Load initial city for the map
     selectCity(model.cityList[0]);
 }
 
+// Delete all markers from the map
 function clearMarkers() {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(null);
@@ -73,9 +73,7 @@ function clearMarkers() {
 function selectCity(city) {
 
     clearMarkers();
-
     model.currentCity(city);
-
     var geocoder = new google.maps.Geocoder();
 
     // Get coordinated for the city
