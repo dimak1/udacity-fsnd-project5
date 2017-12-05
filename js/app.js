@@ -8,6 +8,8 @@ var model;
 var markers = [];
 var map;
 
+var FB_ACCESS_TOKEN = "1486474141471469%7CCzrnnI77lBmR9Y9s2-LEgHOQ_g4";
+
 // City Attraction class
 function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
 
@@ -22,7 +24,7 @@ function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
 
     // data to be populated from Facebook Graph API
     this.desc = "";
-    this.checkinsCount = "";
+    this.checkinsCount = "n/a";
     this.priceRange = "";
 }
 
@@ -36,9 +38,11 @@ function ViewModel() {
     model.searchString = ko.observable("");
     model.filteredAttractionList = ko.computed(function() {
         return ko.utils.arrayFilter(model.cityAttractions(), function(data) {
-            if (data.name.toLowerCase().startsWith(model.searchString())) {
+            if (data.name.toLowerCase().startsWith(model.searchString().toLowerCase())) {
+                data.marker.setVisible(true);
                 return true;
             } else {
+                data.marker.setVisible(false);
                 return false;
             }
         });
@@ -54,9 +58,21 @@ ko.applyBindings(new ViewModel());
 // Call this method when Google Map Api is loaded
 function initMap() {
     infoWindow = new google.maps.InfoWindow();
+
+    // Clear search and display markers when closing infoWindow
+    google.maps.event.addListener(infoWindow, "closeclick", function() {
+        clearSearchAndShowMarkers();
+    });
+
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13
     });
+
+    // Clear search and display markers clicking anywhere on the map
+    map.addListener('click', function() {
+        clearSearchAndShowMarkers();
+    });
+
     // Load initial city for the map
     selectCity(model.cityList[0]);
 }
@@ -67,6 +83,13 @@ function clearMarkers() {
         markers[i].setMap(null);
     }
     markers = [];
+}
+
+function clearSearchAndShowMarkers() {
+    model.searchString("");
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setVisible(true);
+    }
 }
 
 // Select city from the list in modal
@@ -193,7 +216,7 @@ function placeDetailsCallback(place, status) {
         var lng = attraction.marker.position.lng()
 
         // Call Facebook API to get additional info about Attraction
-        $.getJSON("https://graph.facebook.com/v2.11/search?access_token=1486474141471469%7CCzrnnI77lBmR9Y9s2-LEgHOQ_g4&type=place&center=" +
+        $.getJSON("https://graph.facebook.com/v2.11/search?access_token=" + FB_ACCESS_TOKEN + "&type=place&center=" +
                 lat + "," + lng + "&fields=name,price_range,checkins,description",
                 function(result) {
                     $.each(result.data, function(index, place) {
@@ -255,7 +278,10 @@ function createInfoWindowContent(attraction) {
 
 // Hide any visible modals and display error message via modal
 function showErrorMessage(errorMessage, status) {
-    infoWindow.close();
+    // Check for infoWindow in case error before it was defined (e.g. during map api load)
+    if (infoWindow != undefined) {
+        infoWindow.close();
+    }
     var msg = errorMessage + "<br/><br/><div class=\"text-muted small\">" + status + "</div>";
     model.errorMessage(msg);
     $('#errorModal').modal('show');
@@ -263,5 +289,5 @@ function showErrorMessage(errorMessage, status) {
 
 // Google Maps error
 function gm_authFailure() {
-    showErrorMessage("Error loading Google Maps", "");
+    showErrorMessage("Error loading Google Maps.", "Check Google Maps API url and/or access key");
 }

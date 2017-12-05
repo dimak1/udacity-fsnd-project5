@@ -63,7 +63,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Attractions for <span data-bind="text: currentCity"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-bind="click: clearSearchAndShowMarkers">
                       <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -77,7 +77,7 @@
                     </dl>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-link btn-sm text-dark" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-link btn-sm text-dark" data-dismiss="modal" data-bind="click: clearSearchAndShowMarkers">Close</button>
                 </div>
             </div>
         </div>
@@ -173,7 +173,7 @@
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
-    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
+    <script async onerror="gm_authFailure()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCxAxHUSELCS5ekBVH_eXecYpgC52vJeE&callback=initMap&libraries=places"></script>
 </body>
 
 </html>
