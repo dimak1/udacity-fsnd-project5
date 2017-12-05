@@ -24,17 +24,14 @@ function CityAttraction(marker, rating, address, icon, isOpenNow, placeId) {
     this.priceRange = "";
 }
 
-// var markerOptions = new google.maps.markerOptions({});
-
 function ViewModel() {
     model = this;
     model.currentAttraction = ko.observable();
     model.currentCity = ko.observable();
     model.cityAttractions = ko.observableArray([]);
-    model.cityList = ["Toronto", "New York", "Miami"];
+    model.cityList = ["Toronto", "New York", "Miami", "San Francisco"];
     model.searchString = ko.observable("");
     model.filteredAttractionList = ko.computed(function() {
-        // return "city " + model.searchString();
         return ko.utils.arrayFilter(model.cityAttractions(), function(data) {
             if (data.name.toLowerCase().startsWith(model.searchString())) {
                 return true;
@@ -58,14 +55,8 @@ function initMap() {
 
     infoWindow = new google.maps.InfoWindow();
 
-    // Initial Location is Toronto, Canada
-    // var initialLocation = {
-    //     "lat": 43.653226,
-    //     "lng": -79.3831843
-    // };
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13
-        // center: initialLocation
     });
 
     selectCity(model.cityList[0]);
